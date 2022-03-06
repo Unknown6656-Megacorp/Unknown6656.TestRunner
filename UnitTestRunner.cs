@@ -1,4 +1,4 @@
-﻿#define DEBUG__RETHROW_ON_FAILED_TEST
+#define DEBUG__RETHROW_ON_FAILED_TEST
 
 #nullable enable
 
@@ -16,7 +16,6 @@ using System;
 using Unknown6656.Testing;
 
 
-return UnitTestRunner.RunTests(args.Select(arg => Assembly.LoadFrom(arg)));
 
 
 namespace Unknown6656.Testing
