@@ -1,25 +1,51 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
+
+        <LangVersion>preview</LangVersion>
+        <EnablePreviewFeatures>True</EnablePreviewFeatures>
+        <!-- <GenerateRequiresPreviewFeaturesAttribute>False</GenerateRequiresPreviewFeaturesAttribute> -->
+        <Nullable>enable</Nullable>
+        <NullableContextOptions>enable</NullableContextOptions>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+        <!--<OutputType>--><!-- TODO --><!--</OutputType>-->
+        <OutputPath>$(SolutionDir)bin</OutputPath>
+
+        <Deterministic>true</Deterministic>
         <IsPackable>true</IsPackable>
+        <!-- <TrimMode>Link</TrimMode> -->
+        <!-- <PublishTrimmed>true</PublishTrimmed> -->
+        <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+        <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+        <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+        <DisableWinExeOutputInference>true</DisableWinExeOutputInference>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageId>Unknown6656.TestRunner</PackageId>
+        <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+
         <Authors>Unknown6656</Authors>
         <Company>Unknown6656</Company>
-        <Product>Unknown6656.TestRunner</Product>
+        <Product>Unknown6656.TestRunner by Unknown6656</Product>
         <Description>A .NET unit test runner for the console/terminal.</Description>
-        <Copyright>Copyright © Unknown6656, 2016-2020</Copyright>
+        <Copyright>Copyright © 2016-$([System.DateTime]::Today.ToString(yyyy)), unknown6656</Copyright>
         <PackageProjectUrl>https://github.com/Unknown6656/Unknown6656.TestRunner</PackageProjectUrl>
         <RepositoryUrl>https://github.com/Unknown6656/Unknown6656.TestRunner</RepositoryUrl>
-        <RepositoryType>Git</RepositoryType>
         <PackageTags>unknown6656;unit;test;runner;unittest;mstest;ms</PackageTags>
-        <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-        <PackageLicenseExpression></PackageLicenseExpression>
-        <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-        <AssemblyVersion>1.0.4.0</AssemblyVersion>
-        <FileVersion>1.0.4.0</FileVersion>
-        <Version>1.0.4</Version>
         <PackageIcon>unknown6656-logo-1024.png</PackageIcon>
+
+        <PackageId>Unknown6656.TestRunner</PackageId>
+        <IncludeSymbols>true</IncludeSymbols>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <RepositoryType>Git</RepositoryType>
+        <PackageLicenseExpression>AGPL-3.0</PackageLicenseExpression>
+        <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+
+        <Version>$([System.IO.File]::ReadAllText("$(SolutionDir)version.txt"))</Version>
+        <PackageVersion>$([System.IO.File]::ReadAllText("$(SolutionDir)version.txt"))</PackageVersion>
+        <AssemblyVersion>$([System.IO.File]::ReadAllText("$(SolutionDir)version.txt"))</AssemblyVersion>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="MSTest.TestFramework" Version="2.2.0-preview-20210115-03" />
@@ -28,13 +54,13 @@
         <PackageReference Include="coverlet.collector" Version="3.0.2" />
     </ItemGroup>
     <ItemGroup>
-      <None Include="..\LICENSE.md">
-        <Pack>True</Pack>
-        <PackagePath></PackagePath>
-      </None>
-      <None Include="..\unknown6656-logo-1024.png">
-        <Pack>True</Pack>
-        <PackagePath></PackagePath>
-      </None>
+        <None Include="../LICENSE.md">
+            <Pack>True</Pack>
+            <PackagePath></PackagePath>
+        </None>
+        <None Include="C:/Users/unknown6656/Pictures/unknown6656/unknown6656-logo-1024.png">
+          <Pack>True</Pack>
+          <PackagePath></PackagePath>
+        </None>
     </ItemGroup>
 </Project>
