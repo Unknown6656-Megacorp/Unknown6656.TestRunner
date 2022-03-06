@@ -48,7 +48,7 @@
         <AssemblyVersion>$([System.IO.File]::ReadAllText("$(SolutionDir)version.txt"))</AssemblyVersion>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="MSTest.TestFramework" Version="2.2.0-preview-20210115-03" />
+        <PackageReference Include="MSTest.TestFramework" Version="2.2.8" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.0-preview-20210127-04" />
         <PackageReference Include="MSTest.TestAdapter" Version="2.2.8" />
         <PackageReference Include="coverlet.collector" Version="3.0.2" />
