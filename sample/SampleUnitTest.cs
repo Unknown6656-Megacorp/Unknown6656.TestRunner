@@ -1,10 +1,15 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace SampleTestProject;
+using Unknown6656.Testing;
+
+
+return UnitTestRunner.RunTests();
+
+
 
 
 [TestClass]
-public class UnitTest1
+public class SampleUnitTest
 {
     [TestMethod]
     public void TestMethod1()
