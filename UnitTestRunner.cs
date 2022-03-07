@@ -49,6 +49,15 @@ public abstract class UnitTestRunner
     public static void Skip() => throw new SkippedException();
 
 
+    // prevent override
+    public sealed override bool Equals(object obj) => base.Equals(obj);
+
+    // prevent override
+    public sealed override int GetHashCode() => base.GetHashCode();
+
+    // prevent override
+    public sealed override string ToString() => base.ToString();
+
 
 
     private static void AddTime(ref long target, Stopwatch sw)
@@ -183,7 +192,7 @@ public abstract class UnitTestRunner
             PrintHeader("UNIT TESTS", WIDTH);
             WriteLine($@"
 Testing {types.Length} type(s):
-{string.Concat(types.Select(t => $"    [{new FileInfo(t.Assembly.Location).Name}] {t.FullName}\n"))}");
+{string.Concat(types.Select(t => $"  [{new FileInfo(t.Assembly.Location).Name}] {t.FullName}\n"))}");
 
             foreach (Type t in types)
             {
@@ -198,7 +207,7 @@ Testing {types.Length} type(s):
                 MethodInfo? cleanup = t.GetMethod(nameof(Test_Cleanup));
                 int tpassed = 0, tfailed = 0, tskipped = 0, pleft, ptop, rptop;
 
-                WriteLine($"    Testing class '{t.FullName}'");
+                WriteLine($"  Testing class '{t.FullName}'");
 
                 sinit?.Invoke(container, Array.Empty<object>());
 
@@ -235,7 +244,7 @@ Testing {types.Length} type(s):
 
                 foreach ((MethodInfo nfo, object[] args) in get_methods())
                 {
-                    Write("        [");
+                    Write("    [");
 
                     ptop = CursorTop;
                     pleft = CursorLeft;
@@ -306,13 +315,16 @@ Testing {types.Length} type(s):
                         ++failed;
                         ++tfailed;
 
+                        if (ex is AssertFailedException fail && string.IsNullOrWhiteSpace(fail.Message))
+                            continue;
+
                         ForegroundColor = ConsoleColor.Red;
 
                         while (ex?.InnerException is { })
                         {
                             ex = ex.InnerException;
 
-                            WriteLine($"                  [{ex.GetType()}] {ex.Message}\n{string.Join("\n", ex.StackTrace?.Split('\n').Select(x => $"                {x}") ?? Array.Empty<string>())}");
+                            WriteLine($"       [{ex.GetType()}] {ex.Message}\n{string.Join("\n", ex.StackTrace?.Split('\n').Select(x => $"     {x}") ?? Array.Empty<string>())}");
                         }
 
                         ForegroundColor = ConsoleColor.White;
@@ -325,7 +337,7 @@ Testing {types.Length} type(s):
 
                 AddTime(ref sw_sinit, sw);
 
-                partial_results.Add(new(t.FullName!, tpassed, tskipped, tfailed, sw_sinit, sw_init, sw_method));
+                partial_results.Add(new(t, tpassed, tskipped, tfailed, sw_sinit, sw_init, sw_method));
             }
 
             #endregion
@@ -340,11 +352,12 @@ Testing {types.Length} type(s):
 
             WriteLine();
             PrintHeader("TEST RESULTS", WIDTH);
+            WriteLine();
 
             PrintGraph(0, WIDTH, "", (pr, ConsoleColor.Green), (sr, ConsoleColor.Yellow), (total == 0 ? 0 : 1 - pr - sr, ConsoleColor.Red));
             Print($@"
     MODULES: {partial_results.Count,3}
-    TOTAL:   {passed + failed + skipped,3}
+    METHODS: {passed + failed + skipped,3}
     PASSED:  {passed,3} ({pr * 100,7:F3} %)
     SKIPPED: {skipped,3} ({sr * 100,7:F3} %)
     FAILED:  {failed,3} ({(total == 0 ? 0 : 1 - pr - sr) * 100,7:F3} %)
@@ -365,7 +378,7 @@ Testing {types.Length} type(s):
                 double tdt_tt = mtime < double.Epsilon ? 0 : res.TimeMethod / mtime;
 
                 WriteLine($@"
-        MODULE:  {res.Name}
+        MODULE:  {res.Type.AssemblyQualifiedName}
         PASSED:  {res.Passed,3} ({pr * 100,7:F3} %)
         SKIPPED: {res.Failed,3} ({sr * 100,7:F3} %)
         FAILED:  {res.Skipped,3} ({(tot == 0 ? 0 : 1 - pr - sr) * 100,7:F3} %)
@@ -427,7 +440,7 @@ Testing {types.Length} type(s):
     }
 }
 
-internal record struct MethodRunResults(string Name, int Passed, int Failed, int Skipped, long TimeCtor, long TimeInit, long TimeMethod);
+internal record struct MethodRunResults(Type Type, int Passed, int Failed, int Skipped, long TimeCtor, long TimeInit, long TimeMethod);
 
 /// <summary>
 /// A static class containing asserition utility methods, which extend the framework-provided class <see cref="Assert"/>.
