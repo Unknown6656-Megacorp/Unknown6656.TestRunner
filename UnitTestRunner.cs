@@ -19,6 +19,9 @@ namespace Unknown6656.Testing;
 using static Console;
 
 
+// TODO : add support for Assert.Inconclusive !!!!
+
+
 public abstract class UnitTestRunner
 {
     public virtual void Test_StaticInit()
