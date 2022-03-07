@@ -30,8 +30,8 @@
         <Product>Unknown6656.TestRunner by Unknown6656</Product>
         <Description>A .NET unit test runner for the console/terminal.</Description>
         <Copyright>Copyright © 2016-$([System.DateTime]::Today.ToString(yyyy)), unknown6656</Copyright>
-        <PackageProjectUrl>https://github.com/Unknown6656/Unknown6656.TestRunner</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/Unknown6656/Unknown6656.TestRunner</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/Unknown6656-Megacorp/Unknown6656.TestRunner</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/Unknown6656-Megacorp/Unknown6656.TestRunner</RepositoryUrl>
         <PackageTags>unknown6656;unit;test;runner;unittest;mstest;ms</PackageTags>
         <PackageIcon>unknown6656-logo-1024.png</PackageIcon>
 
