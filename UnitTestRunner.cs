@@ -5,16 +5,14 @@
 #nullable enable
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-using System.Runtime.ExceptionServices;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 using System.Linq;
 using System.IO;
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Unknown6656.Testing;
 
@@ -128,10 +126,34 @@ public abstract class UnitTestRunner
     }
 
 
-    record struct MethodRunResults(string Name, int Passed, int Failed, int Skipped, long TimeCtor, long TimeInit, long TimeMethod);
+    /// <summary>
+    /// Runs all unit tests in the assembly which called this method.
+    /// </summary>
+    /// <returns>The number of failed unit tests (or <pre>-1</pre> if a generic exception occurred).</returns>
+    public static int RunTests() => RunTests(new[] { Assembly.GetCallingAssembly() });
 
+    /// <summary>
+    /// Runs all unit tests in all assemblies loaded by the given <see cref="AppDomain"/>(s).
+    /// </summary>
+    /// <param name="domains">The app domains to be unit tested.</param>
+    /// <returns>The number of failed unit tests (or <pre>-1</pre> if a generic exception occurred).</returns>
+    public static int RunTests(params AppDomain[] domains!!) => RunTests(from d in domains
+                                                                         from asm in d.GetAssemblies()
+                                                                         select asm);
 
-    public static int RunTests(IEnumerable<Assembly> assemblies)
+    /// <summary>
+    /// Runs all unit tests in all given assemblies.
+    /// </summary>
+    /// <param name="assemblies">The assemblies to be unit tested.</param>
+    /// <returns>The number of failed unit tests (or <pre>-1</pre> if a generic exception occurred).</returns>
+    public static int RunTests(params Assembly[] assemblies!!) => RunTests(assemblies as IEnumerable<Assembly>);
+
+    /// <summary>
+    /// Runs all unit tests in all given assemblies.
+    /// </summary>
+    /// <param name="assemblies">The assemblies to be unit tested.</param>
+    /// <returns>The number of failed unit tests (or <pre>-1</pre> if a generic exception occurred).</returns>
+    public static int RunTests(IEnumerable<Assembly> assemblies!!)
     {
         const int WIDTH = 110;
         int exitcode = 0;
@@ -404,6 +426,8 @@ Testing {types.Length} type(s):
         return exitcode;
     }
 }
+
+internal record struct MethodRunResults(string Name, int Passed, int Failed, int Skipped, long TimeCtor, long TimeInit, long TimeMethod);
 
 /// <summary>
 /// A static class containing asserition utility methods, which extend the framework-provided class <see cref="Assert"/>.
