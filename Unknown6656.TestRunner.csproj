@@ -55,7 +55,7 @@
         <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
         <PackageReference Include="MSTest.TestFramework" Version="2.2.9" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
-        <PackageReference Include="MSTest.TestAdapter" Version="2.2.9" />
+        <PackageReference Include="MSTest.TestAdapter" Version="3.0.2" />
         <PackageReference Include="coverlet.collector" Version="3.1.2" />
     </ItemGroup>
     <ItemGroup>
