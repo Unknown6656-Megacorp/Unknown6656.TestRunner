@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
+        <TargetFrameworks>net7.0</TargetFrameworks>
 
         <LangVersion>preview</LangVersion>
         <EnablePreviewFeatures>True</EnablePreviewFeatures>
@@ -53,17 +53,20 @@
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+        <PackageReference Include="MSTest.TestAdapter" Version="3.0.3" />
         <PackageReference Include="MSTest.TestFramework" Version="3.0.3" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0" />
-        <PackageReference Include="MSTest.TestAdapter" Version="3.0.2" />
-        <PackageReference Include="coverlet.collector" Version="3.2.0" />
+        <!--<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0" />-->
+        <!--<PackageReference Include="coverlet.collector" Version="6.0.0">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>-->
     </ItemGroup>
     <ItemGroup>
         <None Include="LICENSE.md">
             <Pack>True</Pack>
             <PackagePath></PackagePath>
         </None>
-        <None Include="C:/Users/unknown6656/Pictures/unknown6656/unknown6656-logo-1024.png">
+        <None Include="unknown6656-logo-1024.png">
             <Pack>True</Pack>
             <PackagePath></PackagePath>
         </None>
