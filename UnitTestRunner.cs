@@ -5,6 +5,7 @@
 #nullable enable
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics;
@@ -24,6 +25,10 @@ using static Console;
 
 public abstract class UnitTestRunner
 {
+    public static bool UseLegacyGraphs { get; } = false;
+
+
+
     public virtual void Test_StaticInit()
     {
     }
@@ -53,14 +58,13 @@ public abstract class UnitTestRunner
 
 
     // prevent override
-    public sealed override bool Equals(object obj) => base.Equals(obj);
+    public sealed override bool Equals(object? obj) => base.Equals(obj);
 
     // prevent override
     public sealed override int GetHashCode() => base.GetHashCode();
 
     // prevent override
-    public sealed override string ToString() => base.ToString();
-
+    public sealed override string? ToString() => base.ToString();
 
 
     private static void AddTime(ref long target, Stopwatch sw)
@@ -104,7 +108,7 @@ public abstract class UnitTestRunner
 
         adjusted[max_index] = (adjusted[max_index].value + remainder, adjusted[max_index].color);
 
-        Print($"{new string(' ', padding)}│", ConsoleColor.White);
+        Print($"{new string(' ', padding)} {(UseLegacyGraphs ? '|' : ' ')}", ConsoleColor.White);
 
         ConsoleColor background = BackgroundColor;
         int barwidth = 0;
@@ -112,7 +116,7 @@ public abstract class UnitTestRunner
 
         for (int i = 0; i < adjusted.Count; i++)
         {
-            Print(new string('█', (int)adjusted[i].value), adjusted[i].color);
+            Print(new string(UseLegacyGraphs ? '█' : '━', (int)adjusted[i].value), adjusted[i].color);
 
             barwidth += (int)adjusted[i].value;
 
@@ -121,20 +125,32 @@ public abstract class UnitTestRunner
                 {
                     ForegroundColor = adjusted[i].color;
 
-                    if (i < adjusted.Count - 1 && adjusted[i + 1].value >= .5)
-                        BackgroundColor = adjusted[i + 1].color;
+                    if (UseLegacyGraphs)
+                    {
+                        if (i < adjusted.Count - 1 && adjusted[i + 1].value >= .5)
+                            BackgroundColor = adjusted[i + 1].color;
 
-                    Write('▌');
+                        Write('▌');
 
-                    BackgroundColor = background;
+                        BackgroundColor = background;
+                    }
+                    else
+                        Write('━');
+
                     ++barwidth;
                 }
         }
 
         if (barwidth < width)
-            Write(new string(width - barwidth > 1 ? '▓' : '█', width - barwidth));
+            Write(new string((width - barwidth, UseLegacyGraphs) switch
+            {
+                (> 1, true) => '▓',
+                (_, true) => '█',
+                (> 1, false) => '╸',
+                (_, false) => '━',
+            }, width - barwidth));
 
-        PrintLine($"│ {description ?? ""}", ConsoleColor.White);
+        PrintLine($"{(UseLegacyGraphs ? '|' : ' ')} {description ?? ""}", ConsoleColor.White);
     }
 
 
@@ -149,23 +165,23 @@ public abstract class UnitTestRunner
     /// </summary>
     /// <param name="domains">The app domains to be unit tested.</param>
     /// <returns>The number of failed unit tests (or <pre>-1</pre> if a generic exception occurred).</returns>
-    public static int RunTests(params AppDomain[] domains!!) => RunTests(from d in domains
-                                                                         from asm in d.GetAssemblies()
-                                                                         select asm);
+    public static int RunTests(params AppDomain[] domains) => RunTests(from d in domains
+                                                                       from asm in d.GetAssemblies()
+                                                                       select asm);
 
     /// <summary>
     /// Runs all unit tests in all given assemblies.
     /// </summary>
     /// <param name="assemblies">The assemblies to be unit tested.</param>
     /// <returns>The number of failed unit tests (or <pre>-1</pre> if a generic exception occurred).</returns>
-    public static int RunTests(params Assembly[] assemblies!!) => RunTests(assemblies as IEnumerable<Assembly>);
+    public static int RunTests(params Assembly[] assemblies) => RunTests(assemblies as IEnumerable<Assembly>);
 
     /// <summary>
     /// Runs all unit tests in all given assemblies.
     /// </summary>
     /// <param name="assemblies">The assemblies to be unit tested.</param>
     /// <returns>The number of failed unit tests (or <pre>-1</pre> if a generic exception occurred).</returns>
-    public static int RunTests(IEnumerable<Assembly> assemblies!!)
+    public static int RunTests(IEnumerable<Assembly> assemblies)
     {
         const int WIDTH = 110;
         int exitcode = 0;
@@ -405,7 +421,7 @@ Testing {types.Length} type(s):
             {
                 static void PrintColorDescription(ConsoleColor col, string description)
                 {
-                    Print("       ███ ", col);
+                    Print($"       {new string(UseLegacyGraphs ? '█' : '━', 3)} ", col);
                     PrintLine(description, ConsoleColor.White);
                 }
 
@@ -475,44 +491,86 @@ public sealed class SkippedException
     }
 }
 
+/// <summary>
+/// Indicates that the annotated method should be tested with the given parameters.
+/// <para/>
+/// <b>NOTE:</b> The parameters passed to this attribute are for <b>one</b> method call only.
+/// If you want to test a method with multiple parameter sets, use multiple instances of <see cref="TestWithAttribute"/>.
+/// </summary>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-public sealed class TestWithAttribute
+public class TestWithAttribute
     : Attribute
 {
-    public object[] Arguments { get; }
+    public object?[] Arguments { get; }
 
 
-    public TestWithAttribute(params object[] args) => Arguments = args.Select(t => (object)t).ToArray();
+    /// <inheritdoc cref="TestWithAttribute"/>
+    public TestWithAttribute(params object?[] args) => Arguments = args.ToArray();
 
+    /// <inheritdoc cref="TestWithAttribute"/>
     public TestWithAttribute(params bool[] args) => Arguments = args.Select(t => (object)t).ToArray();
 
+    /// <inheritdoc cref="TestWithAttribute"/>
     public TestWithAttribute(params byte[] args) => Arguments = args.Select(t => (object)t).ToArray();
 
+    /// <inheritdoc cref="TestWithAttribute"/>
     public TestWithAttribute(params sbyte[] args) => Arguments = args.Select(t => (object)t).ToArray();
 
+    /// <inheritdoc cref="TestWithAttribute"/>
     public TestWithAttribute(params char[] args) => Arguments = args.Select(t => (object)t).ToArray();
 
+    /// <inheritdoc cref="TestWithAttribute"/>
     public TestWithAttribute(params short[] args) => Arguments = args.Select(t => (object)t).ToArray();
 
+    /// <inheritdoc cref="TestWithAttribute"/>
     public TestWithAttribute(params ushort[] args) => Arguments = args.Select(t => (object)t).ToArray();
 
+    /// <inheritdoc cref="TestWithAttribute"/>
+    public TestWithAttribute(params nint[] args) => Arguments = args.Select(t => (object)t).ToArray();
+
+    /// <inheritdoc cref="TestWithAttribute"/>
+    public TestWithAttribute(params nuint[] args) => Arguments = args.Select(t => (object)t).ToArray();
+
+    /// <inheritdoc cref="TestWithAttribute"/>
     public TestWithAttribute(params int[] args) => Arguments = args.Select(t => (object)t).ToArray();
 
+    /// <inheritdoc cref="TestWithAttribute"/>
     public TestWithAttribute(params uint[] args) => Arguments = args.Select(t => (object)t).ToArray();
 
+    /// <inheritdoc cref="TestWithAttribute"/>
     public TestWithAttribute(params long[] args) => Arguments = args.Select(t => (object)t).ToArray();
 
+    /// <inheritdoc cref="TestWithAttribute"/>
     public TestWithAttribute(params ulong[] args) => Arguments = args.Select(t => (object)t).ToArray();
 
+    /// <inheritdoc cref="TestWithAttribute"/>
     public TestWithAttribute(params float[] args) => Arguments = args.Select(t => (object)t).ToArray();
 
+    /// <inheritdoc cref="TestWithAttribute"/>
     public TestWithAttribute(params double[] args) => Arguments = args.Select(t => (object)t).ToArray();
 
+    /// <inheritdoc cref="TestWithAttribute"/>
     public TestWithAttribute(params Type[] args) => Arguments = args;
 
+    /// <inheritdoc cref="TestWithAttribute"/>
     public TestWithAttribute(params Enum[] args) => Arguments = args;
 }
 
+/// <inheritdoc cref="TestWithAttribute"/>
+[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+public sealed class TestWithAttribute<T>
+    : TestWithAttribute
+{
+    /// <inheritdoc cref="TestWithAttribute"/>
+    public TestWithAttribute(params T?[] args)
+        : base(args)
+    {
+    }
+}
+
+/// <summary>
+/// Indicates that the annotated method should be exempted from unit tests (skipped).
+/// </summary>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false)]
 public sealed class SkipAttribute
     : Attribute
@@ -521,7 +579,7 @@ public sealed class SkipAttribute
 
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
 public sealed class TestingPriorityAttribute
-        : Attribute
+    : Attribute
 {
     public uint Priority { get; }
 
