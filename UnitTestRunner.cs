@@ -158,7 +158,7 @@ public abstract class UnitTestRunner
     /// Runs all unit tests in the assembly which called this method.
     /// </summary>
     /// <returns>The number of failed unit tests (or <pre>-1</pre> if a generic exception occurred).</returns>
-    public static int RunTests() => RunTests(new[] { Assembly.GetCallingAssembly() });
+    public static int RunTests() => RunTests(Assembly.GetCallingAssembly());
 
     /// <summary>
     /// Runs all unit tests in all assemblies loaded by the given <see cref="AppDomain"/>(s).
@@ -200,13 +200,13 @@ public abstract class UnitTestRunner
             int passed = 0, failed = 0, skipped = 0;
             long sw_sinit, sw_init, sw_method;
 
-            Type[] types = (from asm in assemblies
-                            from type in asm.GetTypes()
-                            let attr = type.GetCustomAttributes<TestClassAttribute>(true).FirstOrDefault()
-                            where attr is { }
-                            orderby type.Name ascending
-                            orderby type.GetCustomAttributes<PriorityAttribute>(true).FirstOrDefault()?.Priority ?? 0 descending
-                            select type).ToArray();
+            Type[] types = [..from asm in assemblies
+                              from type in asm.GetTypes()
+                              let attr = type.GetCustomAttributes<TestClassAttribute>(true).FirstOrDefault()
+                              where attr is { }
+                              orderby type.Name ascending
+                              orderby type.GetCustomAttributes<PriorityAttribute>(true).FirstOrDefault()?.Priority ?? 0 descending
+                              select type];
 
             PrintHeader("UNIT TESTS", WIDTH);
             WriteLine($@"
